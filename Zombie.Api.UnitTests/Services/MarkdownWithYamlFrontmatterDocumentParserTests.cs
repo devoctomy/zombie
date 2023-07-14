@@ -9,17 +9,15 @@ namespace Zombie.Api.UnitTests.Services
     {
         [Theory]
         [InlineData("Data/Input/Valid/Document1.md")]
+        [InlineData("Data/Input/Valid/Document2.md")]
         public async Task GivenValidMarkdown_WhenValidate_ThenDocumentParsedCorrectly(string documentPath)
         {
             // Arrange
             var documentContent = await File.ReadAllTextAsync(documentPath);
             var sut = new MarkdownWithYamlFrontmatterDocumentParser();
 
-            // Act
+            // Act & Assert
             sut.Validate(documentContent);
-
-            // Assert
-
         }
 
         [Theory]

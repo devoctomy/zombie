@@ -9,11 +9,15 @@
   <ItemGroup>
     <None Remove="Data\Document1.md" />
     <None Remove="Data\Input\Invalid\BadFrontmatter.md" />
+    <None Remove="Data\Input\Valid\Document2.md" />
     <None Remove="Data\Output\Body_Document1.md" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Data\Input\Invalid\BadFrontmatter.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Input\Valid\Document2.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Input\Valid\Document1.md">
