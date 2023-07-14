@@ -2,7 +2,7 @@
 {
     public class UpdateDocumentRequest
     {
-        public string Header { get; set; } // YAML
-        public string Body { get; set; } // Markdown
+        public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
+        public string Body { get; set; }
     }
 }

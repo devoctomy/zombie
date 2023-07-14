@@ -20,7 +20,7 @@ namespace Zombie.Api.Documents
         {
             var command = new CreateDocumentCommand(request);
 
-            var response = await _mediator.Send<CreateDocumentResponse>(command);
+            var response = await _mediator.Send(command);
             return ProcessResponse(response);
         }
 

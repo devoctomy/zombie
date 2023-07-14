@@ -2,7 +2,7 @@
 
 namespace Zombie.Api.Documents
 {
-    public class CreateDocumentResponse : BaseResponse<CreateDocumentResponse>
+    public class CreateDocumentResponse : BaseResponse<Dto.Responses.CreateDocumentResponse>
     {
     }
 }

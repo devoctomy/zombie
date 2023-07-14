@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using Zombie.Api.Dto.Models;
 
 namespace Zombie.Api.Repositories
 {

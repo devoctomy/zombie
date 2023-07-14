@@ -1,4 +1,4 @@
-﻿using Zombie.Api.Dto.Requests;
+﻿using Zombie.Api.Dto.Models;
 
 namespace Zombie.Api.Services
 {

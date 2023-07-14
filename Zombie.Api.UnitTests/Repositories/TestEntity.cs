@@ -1,4 +1,4 @@
-﻿using Zombie.Api.Repositories;
+﻿using Zombie.Api.Dto.Models;
 namespace Zombie.Api.UnitTests.Repositories
 {
     internal class TestEntity : Entity

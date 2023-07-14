@@ -4,6 +4,7 @@ using Markdig.Renderers;
 using Markdig.Syntax;
 using System.Dynamic;
 using YamlDotNet.Serialization;
+using Zombie.Api.Dto.Models;
 
 namespace Zombie.Api.Services
 {
@@ -19,13 +20,13 @@ namespace Zombie.Api.Services
             .UseYamlFrontMatter()
             .Build();
 
-        public Dto.Requests.Document Parse(string markdown)
+        public Document Parse(string markdown)
         {
             var markdownDocument = Markdown.Parse(markdown, Pipeline);
             var yamlBlock = markdownDocument
                 .Descendants<YamlFrontMatterBlock>()
                 .SingleOrDefault();
-            var document = new Dto.Requests.Document();
+            var document = new Document();
 
             if (yamlBlock != null)
             {
