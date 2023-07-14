@@ -201,7 +201,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public void GivenSeveralEntitiesExist_WhenGetWithFilter_ThenCorrectEntitiesReturned()
+        public void GivenSeveralEntitiesExist_AndFilter_WhenGet_ThenCorrectEntitiesReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -243,6 +243,44 @@ namespace Zombie.Api.UnitTests.Repositories
             Assert.Equal(2, results2.Count());
             Assert.Equal("Brown", results2.First().Name);
             Assert.Equal("Blue", results2.Last().Name);
+        }
+
+        [Fact]
+        public void GivenSeveralEntitiesExist_AndNoFilter_WhenGet_ThenAllEntitiesReturned()
+        {
+            // Arrange
+            var sut = new InMemoryRepository<TestEntity>();
+            sut.InsertNew(new TestEntity
+            {
+                Name = "Brown",
+                Value = 0
+            });
+            sut.InsertNew(new TestEntity
+            {
+                Name = "Orange",
+                Value = 1
+            });
+            sut.InsertNew(new TestEntity
+            {
+                Name = "Blue",
+                Value = 2
+            });
+            sut.InsertNew(new TestEntity
+            {
+                Name = "Red",
+                Value = 3
+            });
+            sut.InsertNew(new TestEntity
+            {
+                Name = "Yellow",
+                Value = 4
+            });
+
+            // Act
+            var results = sut.Get<int>();
+
+            // Assert
+            Assert.Equal(5, results.Count());
         }
     }
 }
