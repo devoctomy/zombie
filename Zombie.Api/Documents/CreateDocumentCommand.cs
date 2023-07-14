@@ -5,7 +5,7 @@ namespace Zombie.Api.Documents
 {
     public class CreateDocumentCommand : IRequest<CreateDocumentResponse>
     {
-        public CreateDocumentRequest Request { get; set; }
+        public CreateDocumentRequest Request { get; }
 
         public CreateDocumentCommand(CreateDocumentRequest request)
         {
