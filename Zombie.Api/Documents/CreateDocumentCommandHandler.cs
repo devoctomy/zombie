@@ -20,11 +20,11 @@ namespace Zombie.Api.Documents
             var inserted = _documentRepository.InsertNew(command.Request.Document);
             return Task.FromResult(new CreateDocumentResponse
             {
-                IsSuccess = inserted != null,
-                StatusCode = inserted != null ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.InternalServerError,
-                Value = inserted == null ? null : new Dto.Responses.CreateDocumentResponse
+                IsSuccess = inserted.Status == Repositories.Enums.Status.Success,
+                StatusCode = inserted.Status == Repositories.Enums.Status.Success ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.InternalServerError,
+                Value = inserted?.Value == null ? null : new Dto.Responses.CreateDocumentResponse
                 {
-                    Document = inserted
+                    Document = inserted.Value
                 }
             });
         }

@@ -35,7 +35,7 @@ namespace Zombie.Api.UnitTests.Documents
             };
 
             mockDocumentRepository.Setup(x => x.InsertNew(
-                It.IsAny<Document>())).Returns(document);
+                It.IsAny<Document>())).Returns(new RepositoryResponse<Document>(Api.Repositories.Enums.Status.Success, document));
 
             // Act
             var response = await sut.Handle(command, CancellationToken.None);
@@ -69,7 +69,7 @@ namespace Zombie.Api.UnitTests.Documents
                 });
 
             mockDocumentRepository.Setup(x => x.InsertNew(
-                It.IsAny<Document>())).Returns((Document?)null);
+                It.IsAny<Document>())).Returns(new RepositoryResponse<Document>(Api.Repositories.Enums.Status.NotFound, null));
 
             // Act
             var response = await sut.Handle(command, CancellationToken.None);

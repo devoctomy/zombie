@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using Zombie.Api.Repositories;
+using Zombie.Api.Repositories.Enums;
 
 namespace Zombie.Api.UnitTests.Repositories
 {
@@ -20,7 +21,8 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.InsertNew(entity);
 
             // Assert
-            Assert.False(string.IsNullOrEmpty(result?.Id));
+            Assert.Equal(Status.Success, result.Status);
+            Assert.False(string.IsNullOrEmpty(result.Value?.Id));
         }
 
         [Fact]
@@ -40,8 +42,9 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.InsertNew(entity);
 
             // Assert
-            Assert.NotEqual(initialId, result?.Id);
-            Assert.False(string.IsNullOrEmpty(result?.Id));
+            Assert.Equal(Status.Success, result.Status);
+            Assert.NotEqual(initialId, result?.Value?.Id);
+            Assert.False(string.IsNullOrEmpty(result?.Value?.Id));
         }
 
         [Fact]
@@ -57,10 +60,10 @@ namespace Zombie.Api.UnitTests.Repositories
             var inserted = sut.InsertNew(entity);
 
             // Act
-            var result = sut.Get(inserted.Id);
+            var result = sut.Get(inserted.Value!.Id);
 
             // Assert
-            Assert.Equal(result, entity);
+            Assert.Equal(entity, result.Value);
         }
 
         [Fact]
@@ -89,11 +92,11 @@ namespace Zombie.Api.UnitTests.Repositories
             var inserted = sut.InsertNew(entity);
 
             // Act
-            var result = sut.Delete(inserted.Id);
+            var result = sut.Delete(inserted.Value!.Id);
 
             // Assert
             Assert.True(result);
-            Assert.Null(sut.Get(inserted.Id));
+            Assert.Equal(Status.NotFound, sut.Get(inserted.Value!.Id).Status);
         }
 
         [Fact]
@@ -109,11 +112,11 @@ namespace Zombie.Api.UnitTests.Repositories
             var inserted = sut.InsertNew(entity);
 
             // Act
-            var result = sut.Delete(inserted);
+            var result = sut.Delete(inserted.Value!);
 
             // Assert
             Assert.True(result);
-            Assert.Null(sut.Get(inserted.Id));
+            Assert.Equal(Status.Success, sut.Get(inserted.Value!.Id).Status);
         }
 
         [Fact]
@@ -147,7 +150,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var inserted = sut.InsertNew(entity)!;
             var updated = new TestEntity
             {
-                Id = inserted.Id,
+                Id = inserted.Value!.Id,
                 Name = "Bar",
                 Value = 202
             };
@@ -157,10 +160,10 @@ namespace Zombie.Api.UnitTests.Repositories
 
             // Assert
             Assert.NotNull(result);
-            var check = sut.Get(inserted.Id);
-            Assert.NotNull(check);
-            Assert.Equal(updated.Name, check.Name);
-            Assert.Equal(updated.Value, check.Value);
+            var check = sut.Get(inserted.Value!.Id);
+            Assert.Equal(Status.Success, check.Status);
+            Assert.Equal(updated.Name, check.Value!.Name);
+            Assert.Equal(updated.Value, check.Value!.Value);
         }
 
         [Fact]

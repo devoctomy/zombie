@@ -44,13 +44,13 @@ namespace Zombie.Api.Repositories
             return Delete(entity.Id);
         }
 
-        public T? Get(string id)
+        public RepositoryResponse<T> Get(string id)
         {
             _entities.TryGetValue(id, out var entity);
-            return entity;
+            return new RepositoryResponse<T>(entity != null ? Enums.Status.Success : Enums.Status.NotFound, entity);
         }
 
-        public T? InsertNew(T entity)
+        public RepositoryResponse<T> InsertNew(T entity)
         {
             var id = Guid.NewGuid().ToString();
             entity.CreatedAt = DateTime.UtcNow;
@@ -60,13 +60,13 @@ namespace Zombie.Api.Repositories
                 entity))
             {
                 entity.Id = id;
-                return entity;
+                return new RepositoryResponse<T>(Enums.Status.Success, entity);
             }
 
-            return null;
+            return new RepositoryResponse<T>(Enums.Status.Fail, null);
         }
 
-        public T? Update(T entity)
+        public RepositoryResponse<T> Update(T entity)
         {
             if(string.IsNullOrEmpty(entity.Id))
             {
@@ -74,21 +74,21 @@ namespace Zombie.Api.Repositories
             }
 
             var existing = Get(entity.Id);
-            if(existing == null)
+            if(existing == null || existing.Value == null)
             {
-                return null;
+                return new RepositoryResponse<T>(Enums.Status.NotFound, null);
             }
 
-            existing.UpdatedAt = DateTime.UtcNow;
+            existing.Value.UpdatedAt = DateTime.UtcNow;
             if (_entities.TryUpdate(
                 entity.Id,
                 entity,
-                existing))
+                existing.Value))
             {
-                return existing;
+                return new RepositoryResponse<T>(Enums.Status.Success, entity);
             }
 
-            return null;
+            return new RepositoryResponse<T>(Enums.Status.Fail, null);
         }
     }
 }

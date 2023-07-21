@@ -20,7 +20,6 @@ namespace Zombie.Api.Documents
         public async Task<IActionResult> CreateDocument([FromBody]CreateDocumentRequest request)
         {
             var command = new CreateDocumentCommand(request);
-
             var response = await _mediator.Send(command);
             return ProcessResponse(response);
         }
@@ -33,9 +32,14 @@ namespace Zombie.Api.Documents
             return ProcessResponse(response);
         }
 
-        // Read
-        // Update
-        // Delete
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDocument([FromBody] UpdateDocumentRequest request)
+        {
+            var command = new UpdateDocumentCommand(request);
+            var response = await _mediator.Send(command);
+            return ProcessResponse(response);
+        }
 
+        // Delete
     }
 }
