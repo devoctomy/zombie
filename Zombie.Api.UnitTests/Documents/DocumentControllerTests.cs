@@ -19,11 +19,14 @@ namespace Zombie.Api.UnitTests.Documents
 
             var request = new CreateDocumentRequest
             {
-                Key = "Foo/Bar",
-                Properties = new Dictionary<string, object>
+                Document = new Dto.Models.Document
                 {
-                    { "Foo", "Bar" },
-                    { "Bar", "Foo" }
+                    Key = "Foo/Bar",
+                    Properties = new Dictionary<string, object>
+                    {
+                        { "Foo", "Bar" },
+                        { "Bar", "Foo" }
+                    }
                 }
             };
 
@@ -33,9 +36,7 @@ namespace Zombie.Api.UnitTests.Documents
                 StatusCode = HttpStatusCode.OK,
                 Value = new Dto.Responses.CreateDocumentResponse
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Key = request.Key,
-                    CreatedAt = DateTime.UtcNow,
+                    Document = new Dto.Models.Document()
                 }
             };
 
@@ -64,11 +65,14 @@ namespace Zombie.Api.UnitTests.Documents
 
             var request = new CreateDocumentRequest
             {
-                Key = "Foo/Bar",
-                Properties = new Dictionary<string, object>
+                Document = new Dto.Models.Document
                 {
-                    { "Foo", "Bar" },
-                    { "Bar", "Foo" }
+                    Key = "Foo/Bar",
+                    Properties = new Dictionary<string, object>
+                    {
+                        { "Foo", "Bar" },
+                        { "Bar", "Foo" }
+                    }
                 }
             };
 

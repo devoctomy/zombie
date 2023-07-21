@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using Zombie.Api.Dto.Models;
+
 namespace Zombie.Api.Dto.Responses
 {
     public class UpdateDocumentResponse
     {
-        public string Id { get; set; }
-        public string Key { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public Document? Document { get; set; }
     }
 }

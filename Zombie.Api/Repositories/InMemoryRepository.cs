@@ -53,7 +53,9 @@ namespace Zombie.Api.Repositories
         public T? InsertNew(T entity)
         {
             var id = Guid.NewGuid().ToString();
-            if(_entities.TryAdd(
+            entity.CreatedAt = DateTime.UtcNow;
+            entity.UpdatedAt = null;
+            if (_entities.TryAdd(
                 id,
                 entity))
             {
@@ -64,7 +66,7 @@ namespace Zombie.Api.Repositories
             return null;
         }
 
-        public bool Update(T entity)
+        public T? Update(T entity)
         {
             if(string.IsNullOrEmpty(entity.Id))
             {
@@ -74,13 +76,19 @@ namespace Zombie.Api.Repositories
             var existing = Get(entity.Id);
             if(existing == null)
             {
-                return false;
+                return null;
             }
 
-            return _entities.TryUpdate(
+            existing.UpdatedAt = DateTime.UtcNow;
+            if (_entities.TryUpdate(
                 entity.Id,
                 entity,
-                existing);
+                existing))
+            {
+                return existing;
+            }
+
+            return null;
         }
     }
 }

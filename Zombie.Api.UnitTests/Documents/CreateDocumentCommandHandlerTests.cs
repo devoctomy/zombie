@@ -18,19 +18,20 @@ namespace Zombie.Api.UnitTests.Documents
             var command = new CreateDocumentCommand(
                 new Dto.Requests.CreateDocumentRequest
                 {
-                    Key = "Foo/Bar",
-                    Properties = new Dictionary<string, object>
+                    Document = new Document
                     {
-                        { "Foo", "Bar" },
-                        { "Bar", "Foo" }
-                    },
-                    Body = "Hello World!"
+                        Key = "Foo/Bar",
+                        Properties = new Dictionary<string, object>
+                        {
+                            { "Foo", "Bar" },
+                            { "Bar", "Foo" }
+                        },
+                        Body = "Hello World!"
+                    }
                 });
             var document = new Document
             {
-                Id = Guid.NewGuid().ToString(),
-                Properties = command.Request.Properties,
-                Body = command.Request.Body,
+                Id = Guid.NewGuid().ToString()
             };
 
             mockDocumentRepository.Setup(x => x.InsertNew(
@@ -42,7 +43,7 @@ namespace Zombie.Api.UnitTests.Documents
             // Assert
             Assert.True(response.IsSuccess);
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal(document.Id, response?.Value?.Id);
+            Assert.Equal(document.Id, response?.Value?.Document.Id);
         }
 
         [Fact]
@@ -55,13 +56,16 @@ namespace Zombie.Api.UnitTests.Documents
             var command = new CreateDocumentCommand(
                 new Dto.Requests.CreateDocumentRequest
                 {
-                    Key = "Foo/Bar",
-                    Properties = new Dictionary<string, object>
+                    Document = new Document
                     {
-                        { "Foo", "Bar" },
-                        { "Bar", "Foo" }
-                    },
-                    Body = "Hello World!"
+                        Key = "Foo/Bar",
+                        Properties = new Dictionary<string, object>
+                        {
+                            { "Foo", "Bar" },
+                            { "Bar", "Foo" }
+                        },
+                        Body = "Hello World!"
+                    }
                 });
 
             mockDocumentRepository.Setup(x => x.InsertNew(

@@ -14,25 +14,17 @@ namespace Zombie.Api.Documents
         }
 
         public Task<CreateDocumentResponse> Handle(
-            CreateDocumentCommand request,
+            CreateDocumentCommand command,
             CancellationToken cancellationToken)
         {
-            var document = new Document
-            {
-                Properties = request.Request.Properties,
-                Body = request.Request.Body
-            };
-
-            var inserted = _documentRepository.InsertNew(document);
+            var inserted = _documentRepository.InsertNew(command.Request.Document);
             return Task.FromResult(new CreateDocumentResponse
             {
                 IsSuccess = inserted != null,
                 StatusCode = inserted != null ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.InternalServerError,
                 Value = inserted == null ? null : new Dto.Responses.CreateDocumentResponse
                 {
-                    Id = inserted.Id,
-                    Key = inserted.Key,
-                    CreatedAt = DateTime.UtcNow,
+                    Document = inserted
                 }
             });
         }

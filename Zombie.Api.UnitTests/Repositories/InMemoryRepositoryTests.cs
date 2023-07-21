@@ -77,7 +77,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public void GivenEntityId_AndEntityExists_WhenDelete_ThenTrueReturned_AndEntityRemoved()
+        public void GivenEntityId_AndEntityExists_WhenDelete_ThenEntityRemoved_AndTrueReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -97,7 +97,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public void GivenEntity_AndEntityExists_WhenDelete_ThenTrueReturned_AndEntityRemoved()
+        public void GivenEntity_AndEntityExists_WhenDelete_ThenEntityRemoved_AndTrueReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -135,7 +135,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public void GivenEntity_AndEntityExists_WhenUpdate_ThenTrueReturned_AndEntityUpdated()
+        public void GivenEntity_AndEntityExists_WhenUpdate_ThenEntityUpdated_AndEntityReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -144,7 +144,7 @@ namespace Zombie.Api.UnitTests.Repositories
                 Name = "Foo",
                 Value = 101
             };
-            var inserted = sut.InsertNew(entity);
+            var inserted = sut.InsertNew(entity)!;
             var updated = new TestEntity
             {
                 Id = inserted.Id,
@@ -156,7 +156,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.Update(updated);
 
             // Assert
-            Assert.True(result);
+            Assert.NotNull(result);
             var check = sut.Get(inserted.Id);
             Assert.NotNull(check);
             Assert.Equal(updated.Name, check.Name);
@@ -164,7 +164,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public void GivenEntity_AndEntityNotExists_WhenUpdate_ThenFalseReturned()
+        public void GivenEntity_AndEntityNotExists_WhenUpdate_ThenNullReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -179,7 +179,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.Update(entity);
 
             // Assert
-            Assert.False(result);
+            Assert.Null(result);
         }
 
         [Fact]
