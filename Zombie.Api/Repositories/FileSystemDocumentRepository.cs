@@ -8,13 +8,16 @@ namespace Zombie.Api.Repositories
     public class FileSystemDocumentRepository : IRepository<Document>
     {
         private readonly FileSystemRepositoryOptions _options;
+        private readonly IIoService _ioService;
         private readonly IDocumentParser _documentParser;
 
         public FileSystemDocumentRepository(
             FileSystemRepositoryOptions options,
+            IIoService ioService,
             IDocumentParser documentParser)
         {
             _options = options;
+            _ioService = ioService;
             _documentParser = documentParser;
             CheckBasePathPermissions();
         }
@@ -38,10 +41,10 @@ namespace Zombie.Api.Repositories
 
         public async Task<RepositoryResponse<Document>> Get(string key)
         {
-            var path = Path.Combine(_options.BasePath, key);
+            var path = _ioService.CombinePath(_options.BasePath, key);
             if (File.Exists(path))
             {
-                var data = await File.ReadAllTextAsync(path);
+                var data = await _ioService.ReadAllTextAsync(path);
                 var document = _documentParser.Parse(data);
                 return new RepositoryResponse<Document>(Enums.Status.Success, document);
             }
