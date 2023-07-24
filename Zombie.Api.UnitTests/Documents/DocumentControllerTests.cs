@@ -109,10 +109,7 @@ namespace Zombie.Api.UnitTests.Documents
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Value = new Dto.Models.Document
-                {
-                    Id = id
-                }
+                Value = new Dto.Models.Document()
             };
 
             mockMediator.Setup(x => x.Send(

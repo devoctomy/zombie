@@ -36,44 +36,43 @@ namespace Zombie.Api.Repositories
 
         public bool Delete(T entity)
         {
-            if (string.IsNullOrEmpty(entity.Id))
+            if (string.IsNullOrEmpty(entity.Key))
             {
-                throw new ArgumentException("Entity does not have an Id");
+                throw new ArgumentException("Entity does not have a Key");
             }
 
-            return Delete(entity.Id);
+            return Delete(entity.Key);
         }
 
-        public RepositoryResponse<T> Get(string id)
+        public RepositoryResponse<T> Get(string key)
         {
-            _entities.TryGetValue(id, out var entity);
+            _entities.TryGetValue(key, out var entity);
             return new RepositoryResponse<T>(entity != null ? Enums.Status.Success : Enums.Status.NotFound, entity);
         }
 
-        public RepositoryResponse<T> InsertNew(T entity)
+        public RepositoryResponse<T> Insert(T entity)
         {
-            var id = Guid.NewGuid().ToString();
             entity.CreatedAt = DateTime.UtcNow;
             entity.UpdatedAt = null;
             if (_entities.TryAdd(
-                id,
+                entity.Key,
                 entity))
             {
-                entity.Id = id;
                 return new RepositoryResponse<T>(Enums.Status.Success, entity);
             }
 
+            // !!! Does this get hit if it already exists?
             return new RepositoryResponse<T>(Enums.Status.Fail, null);
         }
 
         public RepositoryResponse<T> Update(T entity)
         {
-            if(string.IsNullOrEmpty(entity.Id))
+            if(string.IsNullOrEmpty(entity.Key))
             {
-                throw new ArgumentException("Entity does not have an Id");
+                throw new ArgumentException("Entity does not have a Key");
             }
 
-            var existing = Get(entity.Id);
+            var existing = Get(entity.Key);
             if(existing == null || existing.Value == null)
             {
                 return new RepositoryResponse<T>(Enums.Status.NotFound, null);
@@ -81,7 +80,7 @@ namespace Zombie.Api.Repositories
 
             existing.Value.UpdatedAt = DateTime.UtcNow;
             if (_entities.TryUpdate(
-                entity.Id,
+                entity.Key,
                 entity,
                 existing.Value))
             {

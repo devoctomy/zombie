@@ -7,44 +7,22 @@ namespace Zombie.Api.UnitTests.Repositories
     public class InMemoryRepositoryTests
     {
         [Fact]
-        public void GivenEntityWithoutId_WhenInsertNew_ThenEntityAdded_AndEntityWithIdReturned()
+        public void GivenEntityWithoutId_WhenInsert_ThenSuccessReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
+                Key = "Folder1/Folder2/Pop",
                 Name = "Foo",
                 Value = 101
             };
 
             // Act
-            var result = sut.InsertNew(entity);
+            var result = sut.Insert(entity);
 
             // Assert
             Assert.Equal(Status.Success, result.Status);
-            Assert.False(string.IsNullOrEmpty(result.Value?.Id));
-        }
-
-        [Fact]
-        public void GivenEntityWithId_WhenInsertNew_ThenEntityAdded_AndEntityWithNewIdReturned()
-        {
-            // Arrange
-            var sut = new InMemoryRepository<TestEntity>();
-            var initialId = Guid.NewGuid().ToString();
-            var entity = new TestEntity
-            {
-                Id = initialId,
-                Name = "Foo",
-                Value = 101
-            };
-
-            // Act
-            var result = sut.InsertNew(entity);
-
-            // Assert
-            Assert.Equal(Status.Success, result.Status);
-            Assert.NotEqual(initialId, result?.Value?.Id);
-            Assert.False(string.IsNullOrEmpty(result?.Value?.Id));
         }
 
         [Fact]
@@ -54,20 +32,21 @@ namespace Zombie.Api.UnitTests.Repositories
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
+                Key = "Folder1/Folder2/pop",
                 Name = "Foo",
                 Value = 101
             };
-            var inserted = sut.InsertNew(entity);
+            var inserted = sut.Insert(entity);
 
             // Act
-            var result = sut.Get(inserted.Value!.Id);
+            var result = sut.Get(inserted.Value!.Key);
 
             // Assert
             Assert.Equal(entity, result.Value);
         }
 
         [Fact]
-        public void GivenEntityId_AndEntityNotExists_WhenGet_ThenNullReturned()
+        public void GivenEntityId_AndEntityNotExists_WhenGet_ThenNotFoundReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
@@ -76,7 +55,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.Get(Guid.NewGuid().ToString());
 
             // Assert
-            Assert.Null(result);
+            Assert.Equal(Status.NotFound, result.Status);
         }
 
         [Fact]
@@ -86,37 +65,39 @@ namespace Zombie.Api.UnitTests.Repositories
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
+                Key = "Folder1/Folder2/pop",
                 Name = "Foo",
                 Value = 101
             };
-            var inserted = sut.InsertNew(entity);
+            var inserted = sut.Insert(entity);
 
             // Act
-            var result = sut.Delete(inserted.Value!.Id);
+            var result = sut.Delete(inserted.Value!.Key);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(Status.NotFound, sut.Get(inserted.Value!.Id).Status);
+            Assert.Equal(Status.NotFound, sut.Get(inserted.Value!.Key).Status);
         }
 
         [Fact]
-        public void GivenEntity_AndEntityExists_WhenDelete_ThenEntityRemoved_AndTrueReturned()
+        public void GivenEntity_AndEntityExists_WhenDelete_ThenEntityRemoved_AndEntityNotFoundOnSubsequentCheck()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
+                Key = "Folder1/Folder2/pop",
                 Name = "Foo",
                 Value = 101
             };
-            var inserted = sut.InsertNew(entity);
+            var inserted = sut.Insert(entity);
 
             // Act
             var result = sut.Delete(inserted.Value!);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(Status.Success, sut.Get(inserted.Value!.Id).Status);
+            Assert.Equal(Status.NotFound, sut.Get(inserted.Value!.Key).Status);
         }
 
         [Fact]
@@ -144,13 +125,14 @@ namespace Zombie.Api.UnitTests.Repositories
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
+                Key = "Folder/Folder2/pop",
                 Name = "Foo",
                 Value = 101
             };
-            var inserted = sut.InsertNew(entity)!;
+            var inserted = sut.Insert(entity)!;
             var updated = new TestEntity
             {
-                Id = inserted.Value!.Id,
+                Key = inserted.Value!.Key,
                 Name = "Bar",
                 Value = 202
             };
@@ -160,20 +142,20 @@ namespace Zombie.Api.UnitTests.Repositories
 
             // Assert
             Assert.NotNull(result);
-            var check = sut.Get(inserted.Value!.Id);
+            var check = sut.Get(inserted.Value!.Key);
             Assert.Equal(Status.Success, check.Status);
             Assert.Equal(updated.Name, check.Value!.Name);
             Assert.Equal(updated.Value, check.Value!.Value);
         }
 
         [Fact]
-        public void GivenEntity_AndEntityNotExists_WhenUpdate_ThenNullReturned()
+        public void GivenEntity_AndEntityNotExists_WhenUpdate_ThenNotFoundReturned()
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
             var entity = new TestEntity
             {
-                Id = Guid.NewGuid().ToString(),
+                Key = "Folder1/Folder2/pop",
                 Name = "Foo",
                 Value = 101
             };
@@ -182,7 +164,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = sut.Update(entity);
 
             // Assert
-            Assert.Null(result);
+            Assert.Equal(Status.NotFound, result.Status);
         }
 
         [Fact]
@@ -208,28 +190,33 @@ namespace Zombie.Api.UnitTests.Repositories
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop1",
                 Name = "Brown",
                 Value = 0
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop2",
                 Name = "Orange",
                 Value = 1
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop3",
                 Name = "Blue",
                 Value = 2
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop4",
                 Name = "Red",
                 Value = 3
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop5",
                 Name = "Yellow",
                 Value = 4
             });
@@ -253,28 +240,33 @@ namespace Zombie.Api.UnitTests.Repositories
         {
             // Arrange
             var sut = new InMemoryRepository<TestEntity>();
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop1",
                 Name = "Brown",
                 Value = 0
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop2",
                 Name = "Orange",
                 Value = 1
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop3",
                 Name = "Blue",
                 Value = 2
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop4",
                 Name = "Red",
                 Value = 3
             });
-            sut.InsertNew(new TestEntity
+            sut.Insert(new TestEntity
             {
+                Key = "pop5",
                 Name = "Yellow",
                 Value = 4
             });

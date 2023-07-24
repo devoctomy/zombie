@@ -17,7 +17,7 @@ namespace Zombie.Api.Documents
             CreateDocumentCommand command,
             CancellationToken cancellationToken)
         {
-            var inserted = _documentRepository.InsertNew(command.Request.Document);
+            var inserted = _documentRepository.Insert(command.Request.Document);
             return Task.FromResult(new CreateDocumentResponse
             {
                 IsSuccess = inserted.Status == Repositories.Enums.Status.Success,

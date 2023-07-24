@@ -9,11 +9,11 @@ namespace Zombie.Api.Repositories
             Expression<Func<T, bool>>? filter = null,
             Func<T, TKey>? orderBy = null);
 
-        public RepositoryResponse<T> Get(string id);
+        public RepositoryResponse<T> Get(string key);
 
-        public RepositoryResponse<T> InsertNew(T entity);
+        public RepositoryResponse<T> Insert(T entity);
 
-        public bool Delete(string id);
+        public bool Delete(string key);
 
         public bool Delete(T entity);
 
