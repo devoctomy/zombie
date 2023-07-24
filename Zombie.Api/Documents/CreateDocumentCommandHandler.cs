@@ -13,12 +13,12 @@ namespace Zombie.Api.Documents
             _documentRepository = documentRepository;
         }
 
-        public Task<CreateDocumentResponse> Handle(
+        public async Task<CreateDocumentResponse> Handle(
             CreateDocumentCommand command,
             CancellationToken cancellationToken)
         {
-            var inserted = _documentRepository.Insert(command.Request.Document);
-            return Task.FromResult(new CreateDocumentResponse
+            var inserted = await _documentRepository.Insert(command.Request.Document);
+            return new CreateDocumentResponse
             {
                 IsSuccess = inserted.Status == Repositories.Enums.Status.Success,
                 StatusCode = inserted.Status == Repositories.Enums.Status.Success ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.InternalServerError,
@@ -26,7 +26,7 @@ namespace Zombie.Api.Documents
                 {
                     Document = inserted.Value
                 }
-            });
+            };
         }
     }
 }

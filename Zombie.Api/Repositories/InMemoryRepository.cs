@@ -8,7 +8,7 @@ namespace Zombie.Api.Repositories
     {
         private ConcurrentDictionary<string, T> _entities = new();
 
-        public IEnumerable<T> Get<TKey>(
+        public Task<IEnumerable<T>> Get<TKey>(
             Expression<Func<T, bool>>? filter = null,
             Func<T, TKey>? orderBy = null)
         {
@@ -24,17 +24,17 @@ namespace Zombie.Api.Repositories
                 enumerable = enumerable.OrderBy(orderBy);
             }
 
-            return enumerable;
+            return Task.FromResult(enumerable);
         }
 
-        public bool Delete(string id)
+        public Task<bool> Delete(string id)
         {
-            return _entities.TryRemove(
+            return Task.FromResult(_entities.TryRemove(
                 id,
-                out var _);
+                out var _));
         }
 
-        public bool Delete(T entity)
+        public Task<bool> Delete(T entity)
         {
             if (string.IsNullOrEmpty(entity.Key))
             {
@@ -44,13 +44,13 @@ namespace Zombie.Api.Repositories
             return Delete(entity.Key);
         }
 
-        public RepositoryResponse<T> Get(string key)
+        public Task<RepositoryResponse<T>> Get(string key)
         {
             _entities.TryGetValue(key, out var entity);
-            return new RepositoryResponse<T>(entity != null ? Enums.Status.Success : Enums.Status.NotFound, entity);
+            return Task.FromResult(new RepositoryResponse<T>(entity != null ? Enums.Status.Success : Enums.Status.NotFound, entity));
         }
 
-        public RepositoryResponse<T> Insert(T entity)
+        public Task<RepositoryResponse<T>> Insert(T entity)
         {
             entity.CreatedAt = DateTime.UtcNow;
             entity.UpdatedAt = null;
@@ -58,21 +58,21 @@ namespace Zombie.Api.Repositories
                 entity.Key,
                 entity))
             {
-                return new RepositoryResponse<T>(Enums.Status.Success, entity);
+                return Task.FromResult(new RepositoryResponse<T>(Enums.Status.Success, entity));
             }
 
             // !!! Does this get hit if it already exists?
-            return new RepositoryResponse<T>(Enums.Status.Fail, null);
+            return Task.FromResult(new RepositoryResponse<T>(Enums.Status.Fail, null));
         }
 
-        public RepositoryResponse<T> Update(T entity)
+        public async Task<RepositoryResponse<T>> Update(T entity)
         {
             if(string.IsNullOrEmpty(entity.Key))
             {
                 throw new ArgumentException("Entity does not have a Key");
             }
 
-            var existing = Get(entity.Key);
+            var existing = await Get(entity.Key);
             if(existing == null || existing.Value == null)
             {
                 return new RepositoryResponse<T>(Enums.Status.NotFound, null);

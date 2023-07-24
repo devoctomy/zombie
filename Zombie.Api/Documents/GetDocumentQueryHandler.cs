@@ -15,17 +15,17 @@ namespace Zombie.Api.Documents
             _documentRepository = documentRepository;
         }
 
-        public Task<GetDocumentResponse> Handle(
+        public async Task<GetDocumentResponse> Handle(
             GetDocumentQuery request,
             CancellationToken cancellationToken)
         {
-            var document = _documentRepository.Get(request.Id);
-            return Task.FromResult(new GetDocumentResponse
+            var document = await _documentRepository.Get(request.Id);
+            return new GetDocumentResponse
             {
                 IsSuccess = document.Status == Status.Success,
                 StatusCode = GetHttpStatusCode(document.Status),
                 Value = document.Value
-            });
+            };
         }
 
         private static HttpStatusCode GetHttpStatusCode(Status status)

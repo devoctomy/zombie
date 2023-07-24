@@ -24,7 +24,7 @@ namespace Zombie.Api.UnitTests.Documents
             var updatedAt = new DateTime(2023, 01, 01);
             mockDocumentRepository.Setup(x => x.Update(
                 It.IsAny<Document>()))
-                .Returns(new RepositoryResponse<Document>(
+                .ReturnsAsync(new RepositoryResponse<Document>(
                     Api.Repositories.Enums.Status.Success,
                     new Document
                     {
@@ -55,7 +55,7 @@ namespace Zombie.Api.UnitTests.Documents
             var updatedAt = new DateTime(2023, 01, 01);
             mockDocumentRepository.Setup(x => x.Update(
                 It.IsAny<Document>()))
-                .Returns(new RepositoryResponse<Document>(Api.Repositories.Enums.Status.NotFound, null));
+                .ReturnsAsync(new RepositoryResponse<Document>(Api.Repositories.Enums.Status.NotFound, null));
 
             // Act
             var response = await sut.Handle(command, CancellationToken.None);

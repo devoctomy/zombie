@@ -15,12 +15,12 @@ namespace Zombie.Api.Documents
             _documentRepository = documentRepository;
         }
 
-        public Task<UpdateDocumentResponse> Handle(
+        public async Task<UpdateDocumentResponse> Handle(
             UpdateDocumentCommand command,
             CancellationToken cancellationToken)
         {
-            var updated = _documentRepository.Update(command.Request.Document);
-            return Task.FromResult(new UpdateDocumentResponse
+            var updated = await _documentRepository.Update(command.Request.Document);
+            return new UpdateDocumentResponse
             {
                 IsSuccess = updated.Status == Status.Success,
                 StatusCode = GetHttpStatusCode(updated.Status),
@@ -28,7 +28,7 @@ namespace Zombie.Api.Documents
                 {
                     Document = updated.Value
                 }
-            });
+            };
         }
 
         private static HttpStatusCode GetHttpStatusCode(Status status)
