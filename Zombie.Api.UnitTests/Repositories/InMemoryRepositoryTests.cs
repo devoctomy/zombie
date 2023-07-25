@@ -75,7 +75,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = await sut.Delete(inserted.Value!.Key);
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(Status.Success, result.Status);
             Assert.Equal(Status.NotFound, (await sut.Get(inserted.Value!.Key)).Status);
         }
 
@@ -96,7 +96,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var result = await sut.Delete(inserted.Value!);
 
             // Assert
-            Assert.True(result);
+            Assert.Equal(Status.Success, result.Status);
             Assert.Equal(Status.NotFound, (await sut.Get(inserted.Value!.Key)).Status);
         }
 

@@ -11,6 +11,7 @@
     <None Remove="Data\Input\Invalid\BadFrontmatter.md" />
     <None Remove="Data\Input\Valid\Document2.md" />
     <None Remove="Data\Output\Body_Document1.md" />
+    <None Remove="TestRepo\Foo\Bar\DeleteTest1 - Copy.md" />
     <None Remove="TestRepo\Foo\Bar\FooBar.md" />
   </ItemGroup>
 
@@ -28,6 +29,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Output\Properties_Document1.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestRepo\Foo\DeleteTest.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TestRepo\Foo\Bar\FooBar.md">

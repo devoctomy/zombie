@@ -27,21 +27,26 @@ namespace Zombie.Api.Repositories
             return Task.FromResult(enumerable);
         }
 
-        public Task<bool> Delete(string id)
+        public Task<RepositoryResponse<T>> Delete(string key)
         {
-            return Task.FromResult(_entities.TryRemove(
-                id,
-                out var _));
+            if(_entities.TryRemove(
+                key,
+                out var document))
+            {
+                return Task.FromResult(new RepositoryResponse<T>(Enums.Status.Success, document));
+            }
+
+            return Task.FromResult(new RepositoryResponse<T>(Enums.Status.NotFound, null));
         }
 
-        public Task<bool> Delete(T entity)
+        public async Task<RepositoryResponse<T>> Delete(T entity)
         {
             if (string.IsNullOrEmpty(entity.Key))
             {
                 throw new ArgumentException("Entity does not have a Key");
             }
 
-            return Delete(entity.Key);
+            return await Delete(entity.Key);
         }
 
         public Task<RepositoryResponse<T>> Get(string key)
@@ -62,7 +67,7 @@ namespace Zombie.Api.Repositories
             }
 
             // !!! Does this get hit if it already exists?
-            return Task.FromResult(new RepositoryResponse<T>(Enums.Status.Fail, null));
+            return Task.FromResult(new RepositoryResponse<T>(Enums.Status.Conflict, null));
         }
 
         public async Task<RepositoryResponse<T>> Update(T entity)

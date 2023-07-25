@@ -2,8 +2,8 @@
 intValue: 1
 stringValue1: Foo
 stringList:
-- Foo
-- Bar
+  - Foo
+  - Bar
 ---
 
 # Header 1

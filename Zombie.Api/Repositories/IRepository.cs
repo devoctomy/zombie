@@ -13,9 +13,9 @@ namespace Zombie.Api.Repositories
 
         public Task<RepositoryResponse<T>> Insert(T entity);
 
-        public Task<bool> Delete(string key);
+        public Task<RepositoryResponse<T>> Delete(string key);
 
-        public Task<bool> Delete(T entity);
+        public Task<RepositoryResponse<T>> Delete(T entity);
 
         public Task<RepositoryResponse<T>> Update(T entity);
     }

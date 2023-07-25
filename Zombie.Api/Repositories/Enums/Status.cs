@@ -6,5 +6,6 @@
         Success = 1,
         Fail = 2,
         NotFound = 3,
+        Conflict = 4,
     }
 }

@@ -63,5 +63,28 @@ namespace Zombie.Api.UnitTests.Services
             Assert.Equal(expectedPropeties, actualProperties);
             Assert.Equal(expectedBody, document.Body);
         }
+
+        [Fact]
+        public async Task GivenDocument_WhenSerialiseToMarkdown_ThenDocumentCorrectlySerialised()
+        {
+            // Arrange
+            var documentContent = await File.ReadAllTextAsync("Data/Input/Valid/Document1.md");
+            var sut = new MarkdownWithYamlFrontmatterDocumentParser();
+            var document = sut.Parse(documentContent);
+
+            // Act
+            var serialised = sut.Serialise(document);
+
+            // Assert
+            var check = sut.Parse(serialised);
+            var expectedPropertiesJson = JsonSerializer.Serialize(
+                document.Properties,
+                new JsonSerializerOptions { WriteIndented = true });
+            var currentPropertiesJson = JsonSerializer.Serialize(
+                check.Properties,
+                new JsonSerializerOptions { WriteIndented = true });
+            Assert.Equal(expectedPropertiesJson, currentPropertiesJson);
+            Assert.Equal(document.Body, check.Body);
+        }
     }
 }

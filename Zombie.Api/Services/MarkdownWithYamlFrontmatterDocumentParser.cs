@@ -15,6 +15,10 @@ namespace Zombie.Api.Services
             .IgnoreUnmatchedProperties()
             .Build();
 
+        private static readonly ISerializer YamlSerializer =
+            new SerializerBuilder()
+            .Build();
+
         private static readonly MarkdownPipeline Pipeline
             = new MarkdownPipelineBuilder()
             .UseYamlFrontMatter()
@@ -39,6 +43,14 @@ namespace Zombie.Api.Services
 
             document.Body = markdown.Substring(yamlBlock != null ? yamlBlock.Span.End + 1 : 0).Trim('\r', '\n', '\t', ' ');
             return document;
+        }
+
+        public string Serialise(Document document)
+        {
+            var yamlFrontMatter = YamlSerializer.Serialize(document.Properties);
+            var markdown = document.Body;
+            var completeDocument = $"---\r\n{yamlFrontMatter}---\r\n\r\n{markdown}";
+            return completeDocument;
         }
 
         public void Validate(string markdown)

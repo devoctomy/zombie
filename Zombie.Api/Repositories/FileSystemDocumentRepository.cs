@@ -22,27 +22,40 @@ namespace Zombie.Api.Repositories
             CheckBasePathPermissions();
         }
 
-        public Task<bool> Delete(string id)
+        public async Task<RepositoryResponse<Document>> Delete(string key)
         {
-            throw new NotImplementedException();
+            var existingDocument = await Get(key);
+            if(existingDocument.Status != Enums.Status.Success)
+            {
+                return existingDocument;
+            }
+
+            var path = _ioService.CombinePath(_options.BasePath, key);
+            _ioService.Delete(path);
+            return existingDocument;
         }
 
-        public Task<bool> Delete(Document entity)
+        public async Task<RepositoryResponse<Document>> Delete(Document entity)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(entity.Key))
+            {
+                throw new ArgumentException("Entity does not have a Key");
+            }
+
+            return await Delete(entity.Key);
         }
 
         public Task<IEnumerable<Document>> Get<TKey>(
             Expression<Func<Document, bool>>? filter = null,
             Func<Document, TKey>? orderBy = null)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // Not sure I can do this with the file system
         }
 
         public async Task<RepositoryResponse<Document>> Get(string key)
         {
             var path = _ioService.CombinePath(_options.BasePath, key);
-            if (File.Exists(path))
+            if (_ioService.Exists(path))
             {
                 var data = await _ioService.ReadAllTextAsync(path);
                 var document = _documentParser.Parse(data);
@@ -52,14 +65,30 @@ namespace Zombie.Api.Repositories
             return new RepositoryResponse<Document>(Enums.Status.NotFound, null);
         }
 
-        public Task<RepositoryResponse<Document>> Insert(Document entity)
+        public async Task<RepositoryResponse<Document>> Insert(Document entity)
         {
-            throw new NotImplementedException();
+            var path = _ioService.CombinePath(_options.BasePath, entity.Key);
+            if (!_ioService.Exists(path))
+            {
+                var document = _documentParser.Serialise(entity);
+                await _ioService.WriteAllTextAsync(path, document);
+                return new RepositoryResponse<Document>(Enums.Status.Success, entity);
+            }
+
+            return new RepositoryResponse<Document>(Enums.Status.Conflict, null);
         }
 
-        public Task<RepositoryResponse<Document>> Update(Document entity)
+        public async Task<RepositoryResponse<Document>> Update(Document entity)
         {
-            throw new NotImplementedException();
+            var path = _ioService.CombinePath(_options.BasePath, entity.Key);
+            if (_ioService.Exists(path))
+            {
+                var document = _documentParser.Serialise(entity);
+                await _ioService.WriteAllTextAsync(path, document);
+                return new RepositoryResponse<Document>(Enums.Status.Success, entity);
+            }
+
+            return new RepositoryResponse<Document>(Enums.Status.NotFound, null);
         }
 
         private void CheckBasePathPermissions()
@@ -69,19 +98,7 @@ namespace Zombie.Api.Repositories
                 throw new FileSystemRepositoryMissingBasePathOption();
             }
 
-            try
-            {
-                string tempFileName = $"{Guid.NewGuid()}.tmp";
-                string tempFileFullPath = Path.Combine(_options.BasePath, tempFileName);
-                using var outputStream = new FileStream(
-                    tempFileFullPath,
-                    FileMode.CreateNew,
-                    FileAccess.ReadWrite,
-                    FileShare.None,
-                    1024,
-                    FileOptions.DeleteOnClose);
-            }
-            catch(Exception)
+            if(!_ioService.CheckPathIsWritable(_options.BasePath))
             {
                 throw new FileSystemRepositoryBasePathNotWritableException(_options.BasePath);
             }

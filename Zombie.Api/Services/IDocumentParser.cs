@@ -6,5 +6,6 @@ namespace Zombie.Api.Services
     {
         public void Validate(string markdown);
         public Document Parse(string markdown);
+        public string Serialise(Document document);
     }
 }
