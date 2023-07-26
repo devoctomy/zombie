@@ -131,7 +131,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public async void GivenKey_AndDocumentExists_WhenDelete_ThenGetExistingDocument_AndDocumentDeleted()
+        public async void GivenKey_AndDocumentExists_WhenDelete_ThenGetExistingDocument_AndDocumentDeleted_AndSuccessReturned_AndDeletedDocumentReturned()
         {
             // Arrange
             var options = new FileSystemRepositoryOptions
@@ -142,6 +142,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var combinedPath = $"TestRepo/{key}";
             var mockIoService = new Mock<IIoService>();
             var mockDocumentParser = new Mock<IDocumentParser>();
+            var document = new Document();
 
             mockIoService.Setup(x => x.CheckPathIsWritable(
                 It.IsAny<string>()))
@@ -159,10 +160,16 @@ namespace Zombie.Api.UnitTests.Repositories
                 It.IsAny<string>()))
                 .Returns(true);
 
+            mockDocumentParser.Setup(x => x.Parse(
+                It.IsAny<string>()))
+                .Returns(document);
+
             // Act
             var result = await sut.Delete(key);
 
             // Assert
+            Assert.Equal(Api.Repositories.Enums.Status.Success, result.Status);
+            Assert.Equal(document, result.Value);
             mockIoService.Verify(x => x.CheckPathIsWritable(
                 It.Is<string>(y => y == options.BasePath)), Times.Once);
             mockIoService.Verify(x => x.Delete(
@@ -253,7 +260,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public async void GivenDocument_AndDocumentExists_WhenDelete_ThenGetExistingDocument_AndDocumentDeleted()
+        public async void GivenDocument_AndDocumentExists_WhenDelete_ThenGetExistingDocument_AndDocumentDeleted_AndSuccessReturned_AndDeletedDocumentReturned()
         {
             // Arrange
             var options = new FileSystemRepositoryOptions
@@ -264,6 +271,7 @@ namespace Zombie.Api.UnitTests.Repositories
             var combinedPath = $"TestRepo/{key}";
             var mockIoService = new Mock<IIoService>();
             var mockDocumentParser = new Mock<IDocumentParser>();
+            var document = new Document();
 
             mockIoService.Setup(x => x.CheckPathIsWritable(
                 It.IsAny<string>()))
@@ -281,10 +289,16 @@ namespace Zombie.Api.UnitTests.Repositories
                 It.IsAny<string>()))
                 .Returns(true);
 
+            mockDocumentParser.Setup(x => x.Parse(
+                It.IsAny<string>()))
+                .Returns(document);
+
             // Act
             var result = await sut.Delete(new Document { Key = key });
 
             // Assert
+            Assert.Equal(Api.Repositories.Enums.Status.Success, result.Status);
+            Assert.Equal(document, result.Value);
             mockIoService.Verify(x => x.CheckPathIsWritable(
                 It.Is<string>(y => y == options.BasePath)), Times.Once);
             mockIoService.Verify(x => x.Delete(
@@ -298,7 +312,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public async void GivenDocument_AndDocumentNotExists_WhenDelete_ThenNoFileDeleted_AndNotFoundReturned()
+        public async void GivenDocument_AndDocumentNotFound_WhenDelete_ThenNoFileDeleted_AndNotFoundReturned()
         {
             // Arrange
             var options = new FileSystemRepositoryOptions
@@ -344,7 +358,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public async Task GivenDocument_AndUniqueKey_WhenInsert_ThenDocumentInserted()
+        public async Task GivenDocument_AndUniqueKey_WhenInsert_ThenDocumentInserted_AndSuccessReturned()
         {
             // Arrange
             var options = new FileSystemRepositoryOptions
@@ -396,7 +410,7 @@ namespace Zombie.Api.UnitTests.Repositories
         }
 
         [Fact]
-        public async Task GivenDocument_AndConflict_WhenInsert_ThenConflictReturned()
+        public async Task GivenDocument_AndDocumentExists_WhenInsert_ThenConflictReturned()
         {
             // Arrange
             var options = new FileSystemRepositoryOptions
@@ -443,6 +457,108 @@ namespace Zombie.Api.UnitTests.Repositories
                 Times.Once);
             mockIoService.Verify(x => x.Exists(
                 It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GivenDocument_AndDocumentExists_WhenUpdate_ThenDocumentUpdated_AndSuccessReturned()
+        {
+            // Arrange
+            var options = new FileSystemRepositoryOptions
+            {
+                BasePath = "TestRepo"
+            };
+            var key = $"Foo/{Guid.NewGuid()}.md";
+            var combinedPath = $"TestRepo/{key}";
+            var content = "Hello World!";
+            var mockIoService = new Mock<IIoService>();
+            var mockDocumentParser = new Mock<IDocumentParser>();
+            var document = new Document
+            {
+                Key = key
+            };
+
+            mockIoService.Setup(x => x.CheckPathIsWritable(
+                It.IsAny<string>()))
+                .Returns(true);
+
+            var sut = new FileSystemDocumentRepository(
+                options,
+                mockIoService.Object,
+                mockDocumentParser.Object);
+
+            mockIoService.Setup(x => x.CombinePath(
+                It.IsAny<string[]>())).Returns(combinedPath);
+
+            mockIoService.Setup(x => x.Exists(
+                It.IsAny<string>())).Returns(true);
+
+            mockDocumentParser.Setup(x => x.Serialise(
+                It.IsAny<Document>()))
+                .Returns(content);
+
+            // Act
+            var result = await sut.Update(document);
+
+            // Assert
+            Assert.Equal(Api.Repositories.Enums.Status.Success, result.Status);
+            mockIoService.Verify(x => x.CombinePath(
+                It.Is<string>(y => y == options.BasePath),
+                It.Is<string>(y => y == key)),
+                Times.Once);
+            mockIoService.Verify(x => x.Exists(
+                It.Is<string>(y => y == combinedPath)), Times.Once);
+            mockDocumentParser.Verify(x => x.Serialise(
+                It.Is<Document>(y => y == document)), Times.Once);
+            mockIoService.Verify(x => x.WriteAllTextAsync(
+                It.Is<string>(y => y == combinedPath),
+                It.Is<string>(y => y == content)), Times.Once);
+        }
+
+        [Fact]
+        public async Task GivenDocument_AndDocumentNotFound_WhenUpdate_ThenNotFoundReturned()
+        {
+            // Arrange
+            var options = new FileSystemRepositoryOptions
+            {
+                BasePath = "TestRepo"
+            };
+            var key = $"Foo/{Guid.NewGuid()}.md";
+            var combinedPath = $"TestRepo/{key}";
+            var content = "Hello World!";
+            var mockIoService = new Mock<IIoService>();
+            var mockDocumentParser = new Mock<IDocumentParser>();
+            var document = new Document
+            {
+                Key = key
+            };
+
+            mockIoService.Setup(x => x.CheckPathIsWritable(
+                It.IsAny<string>()))
+                .Returns(true);
+
+            var sut = new FileSystemDocumentRepository(
+                options,
+                mockIoService.Object,
+                mockDocumentParser.Object);
+
+            mockIoService.Setup(x => x.CombinePath(
+                It.IsAny<string[]>())).Returns(combinedPath);
+
+            mockDocumentParser.Setup(x => x.Serialise(
+                It.IsAny<Document>()))
+                .Returns(content);
+
+            // Act
+            var result = await sut.Update(document);
+
+            // Assert
+            Assert.Equal(Api.Repositories.Enums.Status.NotFound, result.Status);
+            mockIoService.Verify(x => x.CombinePath(
+                It.Is<string>(y => y == options.BasePath),
+                It.Is<string>(y => y == key)),
+                Times.Once);
+            mockIoService.Verify(x => x.Exists(
+                It.Is<string>(y => y == combinedPath)), Times.Once);
         }
     }
 }
